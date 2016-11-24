@@ -16,7 +16,7 @@ class actor(object):
         Mio = np.ones(inout)
 
         self.W_exp      = 0*Mio     #
-        self.W_var      = -10*Mo      #
+        self.W_var      = 1*Mo      #
 
         self.lastState  = 0*Mi      #
         self.lastAct    = 0*Mo      #
@@ -24,7 +24,6 @@ class actor(object):
     def action(self,state):
         mu    = self.mu(state)
         sigma = self.sigma()
-        print(sigma)
         self.lastAct   = np.random.normal(mu,sigma)
         self.lastState = state
         return self.lastAct
@@ -43,6 +42,6 @@ class actor(object):
         return np.dot(state,self.W_exp)
     def sigma(self):
         try:
-            return np.exp(-self.W_var)/(1+np.exp(-self.W_var))
+            return np.exp(self.W_var)/(1+np.exp(self.W_var))
         except RuntimeWarning:#avoid nan
-            return 1/(1+np.exp(self.W_var))
+            return 1/(1+np.exp(-self.W_var))

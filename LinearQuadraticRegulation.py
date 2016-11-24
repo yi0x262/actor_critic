@@ -12,7 +12,7 @@ class LQR:
     def state(self):
         return self.x
     def reward(self):
-        return 1-np.power(self.x,2)
+        return -np.power(self.x,2)
 
 if __name__ == '__main__':
     from actor_critic import actor_critic
@@ -20,8 +20,7 @@ if __name__ == '__main__':
     lqr= LQR(1)
 
     dt = 0.01
-    t = list(np.arange(0,1,dt))
-    #print(t)
+    t = list(np.arange(0,1000,dt))
 
     from collections import deque
     dq = deque(maxlen=100)
@@ -40,6 +39,4 @@ if __name__ == '__main__':
         #print(lqr.state(),lqr.reward(),sum(dq),_)
         lgr.append([act,lqr.state()[0],lqr.reward()[0],ac.a.W_exp[0],ac.a.W_var[0],ac.c.W[0],TDerr[0]])
 
-    print('now printing...')
     lgr.output('/home/yihome/Pictures/log/LQR_actor_critic',t)
-    print('\a')
