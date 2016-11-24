@@ -15,9 +15,9 @@ class critic(object):
         """
         TDerr = r_t + g*V(s_t+1) - V(s_t)
         """
-        TDerr = reward + self.gamma*self.Value(self.lastState) - self.Value(state)
+        TDerr = reward + self.gamma*self.Value(state) - self.Value(self.lastState)
         self.lastState = state
-        self.W += dt*self.alpha*TDerr*state
+        self.W += dt*self.alpha*TDerr#*state
         return TDerr
     def Value(self,state):
         """

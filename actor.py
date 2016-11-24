@@ -16,7 +16,7 @@ class actor(object):
         Mio = np.ones(inout)
 
         self.W_exp      = 0*Mio     #
-        self.W_var      = 1*Mo      #
+        self.W_var      = -10*Mo      #
 
         self.lastState  = 0*Mi      #
         self.lastAct    = 0*Mo      #
@@ -24,6 +24,7 @@ class actor(object):
     def action(self,state):
         mu    = self.mu(state)
         sigma = self.sigma()
+        print(sigma)
         self.lastAct   = np.random.normal(mu,sigma)
         self.lastState = state
         return self.lastAct
@@ -37,7 +38,7 @@ class actor(object):
 
         a = dt*self.alpha*TDerror
         self.W_exp += a*np.dot(self.lastState.T,self.lastAct-mu)
-        self.W_var += 100*a*(np.power(self.lastAct-mu,2)-np.power(sigma,2))
+        self.W_var += a*(np.power(self.lastAct-mu,2)-np.power(sigma,2))
     def mu(self,state):
         return np.dot(state,self.W_exp)
     def sigma(self):
