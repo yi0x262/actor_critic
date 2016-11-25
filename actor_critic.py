@@ -13,6 +13,7 @@ class actor_critic(object):
         self.c = critic(inout[0],alpha=alpha,gamma=gamma)
 
     def action(self,state,reward,dt):
+        #print(state,reward,dt)
         TDerr = self.c.TDerror(state,reward,dt)
         self.a.update(TDerr,dt)
 

@@ -17,7 +17,7 @@ class critic(object):
         """
         TDerr = reward + self.gamma*self.Value(state) - self.Value(self.lastState)
         self.lastState = state
-        self.W += dt*self.alpha*TDerr#*state
+        self.W += dt*self.alpha*TDerr*state
         return TDerr
     def Value(self,state):
         """
