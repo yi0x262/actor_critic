@@ -11,21 +11,24 @@ class actor(object):
         """
         self.alpha = alpha
 
-        Mi  = np.ones((1,inout[0]))
-        Mo  = np.ones((1,inout[1]))
-        Mio = np.ones(inout)
+        Mi  = np.empty((1,inout[0]))#input
+        Mo  = np.empty((1,inout[1]))#output
 
-        self.W_exp      = 0*Mio     #
-        self.W_var      = 1*Mo      #
+        self.W_exp      = np.zeros(inout)       #
+        self.W_var      = np.ones_like(Mo)      #
 
-        self.lastState  = 0*Mi      #
-        self.lastAct    = 0*Mo      #
+        self.lastState  = np.zeros_like(Mi)     #
+        self.lastAct  = np.zeros_like(Mo)       #
 
     def action(self,state):
-        mu    = self.mu(state)
+        """
+        state : np.array(ndim=1) or list_like
+        """
+        s = np.array([state])
+        mu    = self.mu(s)
         sigma = self.sigma()
         self.lastAct   = np.random.normal(mu,sigma)
-        self.lastState = state
+        self.lastState = s
         return self.lastAct
     def update(self,TDerror,dt):
         """
@@ -45,3 +48,10 @@ class actor(object):
             return np.exp(self.W_var)/(1+np.exp(self.W_var))
         except RuntimeWarning:#avoid nan
             return 1/(1+np.exp(-self.W_var))
+
+if __name__ == '__main__':
+    inout = (2,3)
+    a = actor(inout)
+    print(a.action(np.zeros(inout[0])))
+    print(a.update(1,0.1))
+    print(a.action(np.zeros(inout[0])))
