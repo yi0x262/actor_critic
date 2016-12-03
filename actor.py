@@ -33,6 +33,7 @@ class actor(object):
         self.lastState = np.array([state])
         mu    = self.mu(self.lastState)
         sigma = self.sigma()
+        print('mu',mu,'sigma',sigma)
         self.lastAct   = np.random.normal(mu,sigma)
         return self.lastAct
 
@@ -52,8 +53,6 @@ class actor(object):
 
         e_exp = self.lastState.T.dot(self.lastAct - mu)
         e_var = ((self.lastAct - mu)**2 - sigma**2)*(1-sigma)
-
-        print(e_exp)
 
         self.D_exp += update*((1-self.beta)*self.D_exp + e_exp)
         self.D_var += update*((1-self.beta)*self.D_var + e_var)

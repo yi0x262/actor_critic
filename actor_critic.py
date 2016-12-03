@@ -14,6 +14,7 @@ class actor_critic(object):
 
     def action(self,state,reward,dt):
         #print(state,reward,dt)
+        #print('ac\n',state,reward)
         TDerr = self.c.TDerror(state,reward,dt)
         self.a.update(TDerr,dt)
 

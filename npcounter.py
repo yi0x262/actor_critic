@@ -10,6 +10,7 @@ class npcounter(object):
         limits  : time limits (list or numpy ndim=1)
         dt      : add time (float scalar or numpy ndim=1)
         """
+        print('counter',self.counter)
         self.counter += dt               #countup
         ret = limits < self.counter      #cmp
         self.counter -= ret*self.counter #count reset
