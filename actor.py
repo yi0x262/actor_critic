@@ -4,7 +4,7 @@ from npcounter import npcounter
 #An Analysis of Actor-Critic Algorithms using Eligibility Traces:Reinforcement Learning with Imperfect Value Functions (kimura,1996?)
 #!!basic version (no eligibility traces)!!
 class actor(object):
-    def __init__(self,inout,alpha=0.05,beta=0.9):
+    def __init__(self,inout,alpha,beta):
         """
         inout = (in,out)
         alpha = learning gain (0 < alpha)

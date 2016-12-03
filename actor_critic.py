@@ -2,23 +2,25 @@
 from actor import actor
 from critic import critic
 
-class actor_critic(object):
-    def __init__(self,inout,alpha=0.05,gamma=0.95):
+class actor_critic(actor,critic):
+    def __init__(self,inout,alpha=0.05,beta=0.90,gamma=0.95):
         """
         inout : (in,out)
         alpha : learning gain
-        gamma : discount rate
+        beta  : discount rate (for eligibility)
+        gamma : discount rate (for reward)
         """
-        self.a = actor(inout,alpha=alpha)
-        self.c = critic(inout[0],alpha=alpha,gamma=gamma)
+        super(actor_critic,self).__init__(inout,alpha,beta)
+        super(actor,self).__init__(inout[0],alpha,gamma)
 
     def action(self,state,reward,dt):
         #print(state,reward,dt)
         #print('ac\n',state,reward)
-        TDerr = self.c.TDerror(state,reward,dt)
-        self.a.update(TDerr,dt)
+        TDerr = self.TDerror(state,reward,dt)
+        self.update(TDerr,dt)
 
-        return self.a.action(state),TDerr
+        return super(actor_critic,self).action(state),TDerr
 
 if __name__ == '__main__':
-    pass
+    inout = (2,2)
+    ac = actor_critic(inout)

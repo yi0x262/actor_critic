@@ -4,14 +4,13 @@ import numpy as np
 #An Analysis of Actor-Critic Algorithms using Eligibility Traces:Reinforcement Learning with Imperfect Value Functions (kimura,1996?)
 #!!basic version (no eligibility traces)!!
 class critic(object):
-    def __init__(self,state_num,alpha=0.05,gamma=0.95):
+    def __init__(self,state_num,alpha,gamma):
         self.alpha = alpha
         self.gamma = gamma
 
         W1 = np.ones((1,state_num))
         self.W          = np.random.normal(0*W1,0.5*W1)
         self.lastState  = 0*W1[0]
-        print('c_init',self.W,self.lastState)
     def TDerror(self,state,reward,dt):
         """
         TDerr = r_t + g*V(s_t+1) - V(s_t)
