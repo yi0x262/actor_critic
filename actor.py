@@ -23,7 +23,7 @@ class optional_matrix(np.ndarray):
         w0 = keys.pop('w0',0.)
         for key in [k for k in keys if not hasattr(np.ndarray,k)]:
             setattr(self,key,keys.pop(key))
-        return w0*super().__new__(self,shape,**keys)
+        return 0.*super().__new__(self,shape,**keys)+w0
 
 class eligibility_tracer(optional_matrix):
     def __call__(self,dt,e):
@@ -39,7 +39,7 @@ class weight_eligibility(optional_matrix):
     def update(self,dt,TDerror,*args):
         #print('weight_eligibility',args)
         e = self.eligibility(*args)
-        self += self.alpha*TDerror*self.D(dt,e)
+        self += self.alpha*TDerror*self.D(dt,e)*dt
 
 class actor(object):
     def __init__(self,inout,alpha=0.05,beta=0.90):
@@ -58,7 +58,7 @@ class actor(object):
                     {
                         '__call__'    : weight_var_calc,
                         'eligibility' : lambda self,a,mu,sigma:((a-mu)**2-sigma**2)*(1-sigma)
-                    })((1,inout[1]))
+                    })((1,inout[1]),w0=0.5)
         self.timer = counter((1,inout[1]))
     def __call__(self,state):
         self.lastState = state
@@ -68,7 +68,10 @@ class actor(object):
         self.lastAct = np.random.normal(self.mu,self.sigma)
         return self.lastAct
     def update(self,t,TDerr):
-        dt = self.timer(t,self.sigma)*self.sigma
+        try:
+            dt = self.timer(t,self.sigma)*self.sigma
+        except AttributeError:
+            return    
         #print('actor.update\na:\n{}\nx:\n{}\nmu\n{}\nsigma\n{}'.format(self.lastAct,self.lastState,self.mu,self.sigma))
         self.W_exp.update(dt,TDerr,self.lastAct,self.lastState,self.mu)
         self.W_var.update(dt,TDerr,self.lastAct,self.mu,self.sigma)
