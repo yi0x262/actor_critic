@@ -19,8 +19,12 @@ class actor_critic(actor,critic):
         TDerr = self.TDerror(state,reward,dt)
         self.update(TDerr,dt)
 
-        return super(actor_critic,self).action(state),TDerr
+        return super(actor_critic,self).__call__(state),TDerr
 
 if __name__ == '__main__':
-    inout = (2,2)
-    ac = actor_critic(inout)
+    import numpy as np
+    i,o = 3,2
+    s = np.ones((1,i))
+
+    ac = actor_critic((i,o))
+    print(*ac.action(s,1,0.1))
