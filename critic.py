@@ -3,6 +3,7 @@ import numpy as np
 
 #An Analysis of Actor-Critic Algorithms using Eligibility Traces:Reinforcement Learning with Imperfect Value Functions (kimura,1996?)
 #!!basic version (no eligibility traces)!!
+
 class critic(object):
     def __init__(self,state_num,alpha,gamma):
         self.alpha = alpha

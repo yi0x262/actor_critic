@@ -27,4 +27,4 @@ if __name__ == '__main__':
     s = np.ones((1,i))
 
     ac = actor_critic((i,o))
-    print(*ac.action(s,1,0.1))
+    print(*ac.action(s,1,0.1))    

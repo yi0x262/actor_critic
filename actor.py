@@ -71,7 +71,7 @@ class actor(object):
         try:
             dt = self.timer(t,self.sigma)*self.sigma
         except AttributeError:
-            return    
+            return
         #print('actor.update\na:\n{}\nx:\n{}\nmu\n{}\nsigma\n{}'.format(self.lastAct,self.lastState,self.mu,self.sigma))
         self.W_exp.update(dt,TDerr,self.lastAct,self.lastState,self.mu)
         self.W_var.update(dt,TDerr,self.lastAct,self.mu,self.sigma)
