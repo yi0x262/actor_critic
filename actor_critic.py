@@ -17,7 +17,8 @@ class actor_critic(actor,critic):
         #print(state,reward,dt)
         #print('ac\n',state,reward)
         TDerr = self.TDerror(state,reward,dt)
-        self.update(TDerr,dt)
+        self.update(dt,TDerr)
+        #print('actor_critic',dt,TDerr)
 
         return super(actor_critic,self).__call__(state),TDerr
 
@@ -27,4 +28,4 @@ if __name__ == '__main__':
     s = np.ones((1,i))
 
     ac = actor_critic((i,o))
-    print(*ac.action(s,1,0.1))    
+    print(*ac.action(s,1,0.1))

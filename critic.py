@@ -10,24 +10,29 @@ class critic(object):
         self.gamma = gamma
 
         W1 = np.ones((1,state_num))
-        self.W          = np.random.normal(0*W1,0.5*W1)
-        self.lastState  = 0*W1[0]
+        self.W_crt = np.random.normal(0*W1,0.5*W1)*W1
+        self.lastState = 0*W1
     def TDerror(self,state,reward,dt):
         """
         TDerr = r_t + g*V(s_t+1) - V(s_t)
         """
-        TDerr = reward + self.gamma*self.Value(state) - self.Value(self.lastState)
+        try:
+            TDerr = reward + self.gamma*self.Value(state) - self.Value(self.lastState)
+        except RuntimeWarning:
+            print('critic.TDerror',self,state,self.lastState)
+            raise RuntimeWarning
         #print('TDerr',self.W,dt,self.alpha,TDerr,state)
-        self.W += dt*self.alpha*TDerr*state
+        self.W_crt += dt*self.alpha*TDerr*state
+        self.W_crt = np.nan_to_num(self.W_crt)
 
         self.lastState = state
-        return TDerr
+        return np.nan_to_num(TDerr)
     def Value(self,state):
         """
-        V(s) = s.W^T / |\{s\}|
+        V(s) = s.W^T / len(s)
 
         state -> expected reward
         R^1*s -> R
         """
-        #print('c_value\n',state,self.W)
-        return np.dot(state,self.W.T)/state.shape[0]
+        #print('c_value\n',state,self.W_crt)
+        return np.dot(state,self.W_crt.T)/state.shape[0]

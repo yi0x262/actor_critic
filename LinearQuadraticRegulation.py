@@ -1,42 +1,48 @@
 #!/usr/env/bin python3
 import numpy as np
-class LQR:
-    def __init__(self,x0,x_range=(0,4)):
-        self.x = np.ones((1,1))*x0
-        self.x_range = x_range
+from actor import optional_matrix
+
+from collections import deque
+class LQR(optional_matrix):
+    act = deque(maxlen=100)
     def update(self,a,dt):
-        self.x += np.ones((1,1))*a*dt
-        #limit range
-        self.x = np.clip(self.x,self.x_range[0],self.x_range[1])#self.x_range[0],self.x_range[1])
-        return self.x
-    def state(self):
-        return self.x
+        self += a*dt
+        #return np.clip(self,self.range[0],self.range[1])
+        return max(self.range[0],min(self.range[1],self))
     def reward(self):
-        return -np.power(self.x,2)
+        return 0.1-self**2# + 0.1*abs(self)<0.2
 
 if __name__ == '__main__':
+    shape = (1,1)
+
     from actor_critic import actor_critic
-    ac = actor_critic((1,1))
-    lqr= LQR(1)
+    ac = actor_critic(shape,alpha=0.2,beta=0.75)
+    lqr= LQR(shape,range=(0,4),w0=1.)
+    print(lqr,lqr.range)
 
-    dt = 0.01
-    t = list(np.arange(0,1000,dt))
-
-    from collections import deque
-    dq = deque(maxlen=100)
+    dt = 0.1
+    t = list(np.arange(0,5000,dt))
 
     import sys,os
     sys.path.append(os.path.dirname(os.path.dirname(__file__))+ '/central_pattern_generator')
     from save_plot import logger
-    lgr = logger(['act','state','reward','actor_W_exp','actor_W_ver','critic_W','TDerror'])
+    lgr = logger(['act','state','reward','actor_W_exp','W_exp_D','actor_W_var','W_var_D','critic_W','TDerror'])
+
+    from collections import deque
+    action_deq = deque(maxlen=100)
+
+    rec_t = []
 
     for _ in t:
-        act,TDerr = ac.action(lqr.state(),lqr.reward(),dt)
+        #print('LQR_main',lqr,lqr.reward())
+        try:
+            act,TDerr = ac.action(lqr,lqr.reward(),dt)
+        except RuntimeWarning:
+            break
+        rec_t.append(_)
+        #print('LQR_MAIN',act,TDerr)
         lqr.update(act,dt)
-        dq.append(lqr.reward())
-        #if sum(dq)/len(dq) > 1-1e-4:
-        #    lqr = LQR(1)
-        #print(lqr.state(),lqr.reward(),sum(dq),_)
-        lgr.append([act,lqr.state()[0],lqr.reward()[0],ac.a.W_exp[0],ac.a.W_var[0],ac.c.W[0],TDerr[0]])
+        action_deq.append(act)
+        lgr.append([sum(action_deq)[0]/len(action_deq),lqr[0],lqr.reward()[0],ac.W_exp[0],ac.W_exp.D[0],ac.W_var[0],ac.W_var.D[0],ac.W_crt[0],TDerr[0]])
 
-    lgr.output('/home/yihome/Pictures/log/LQR_actor_critic',t)
+    lgr.output('/home/yihome/Pictures/log/LQR_actor_critic',rec_t)

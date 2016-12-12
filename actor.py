@@ -15,6 +15,7 @@ class counter(np.ndarray):
         self += dt
         judge = self > threshold
         self *= ~judge
+        #print('timer',self,dt,threshold,judge)
         return judge*threshold
 
 class optional_matrix(np.ndarray):
@@ -28,6 +29,8 @@ class optional_matrix(np.ndarray):
 class eligibility_tracer(optional_matrix):
     def __call__(self,dt,e):
         self += ((self.beta-1)*self + e)*dt
+        self = np.nan_to_num(self)
+        #print('delta D & dt',(self.beta-1)*self + e,dt)
         return self
 
 class weight_eligibility(optional_matrix):
@@ -40,6 +43,8 @@ class weight_eligibility(optional_matrix):
         #print('weight_eligibility',args)
         e = self.eligibility(*args)
         self += self.alpha*TDerror*self.D(dt,e)*dt
+        self = np.nan_to_num(self)
+        #print('weight',e,self.D,dt)
 
 class actor(object):
     def __init__(self,inout,alpha=0.05,beta=0.90):
@@ -58,14 +63,20 @@ class actor(object):
                     {
                         '__call__'    : weight_var_calc,
                         'eligibility' : lambda self,a,mu,sigma:((a-mu)**2-sigma**2)*(1-sigma)
-                    })((1,inout[1]),w0=0.5)
+                    })((1,inout[1]),w0=0.55)
         self.timer = counter((1,inout[1]))
     def __call__(self,state):
         self.lastState = state
         self.mu = self.W_exp(state)
         self.sigma = self.W_var()
         #print('actor.__call__\nmu:\n{}\nsigma:\n{}'.format(self.mu,self.sigma))
-        self.lastAct = np.random.normal(self.mu,self.sigma)
+        try:
+            self.lastAct = np.random.normal(self.mu,self.sigma)*np.ones_like(self.sigma)
+        except:
+            print('runtimewarning:actor_call_',self.mu,self.sigma)
+            raise RuntimeWarning
+        #np.ones_like save answer type ndarray if shape is (1,1)
+        #(if not,it goes a float)
         return self.lastAct
     def update(self,t,TDerr):
         try:
