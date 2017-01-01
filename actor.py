@@ -33,7 +33,8 @@ class eligibility_tracer(optional_matrix):
         #print('delta D & dt',(self.beta-1)*self + e,dt)
         return self
 
-class weight_eligibility(optional_matrix):
+import abc
+class weight_eligibility(optional_matrix,metaclass=abc.ABCMeta):
     def __new__(self,shape,alpha=0.05,beta=0.90,**keys):
         #print('w_eligibility',keys)
         self.alpha = keys.pop('alpha',alpha)
@@ -45,10 +46,13 @@ class weight_eligibility(optional_matrix):
         self += self.alpha*TDerror*self.D(dt,e)*dt
         self = np.nan_to_num(self)
         #print('weight',e,self.D,dt)
+    @abc.abstractmethod
+    def eligibility(self):
+        """calc e in update()"""
+        pass
 
 class actor(object):
     def __init__(self,inout,alpha=0.05,beta=0.90):
-        self.alpha = alpha
         self.W_exp = type('weight_exp',(weight_eligibility,),
                     {
                         '__call__'    : lambda self,x:x.dot(self),
