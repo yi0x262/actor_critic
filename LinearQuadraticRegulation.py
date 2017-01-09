@@ -1,9 +1,9 @@
-#!/usr/env/bin python3
+#!/usr/env/bin python2
 import numpy as np
 from actor import optional_matrix
 
 from collections import deque
-class LQR(optional_matrix):
+class LQR(optional_matrix,object):
     act = deque(maxlen=100)
     def update(self,a,dt):
         self += a*dt
@@ -16,12 +16,12 @@ if __name__ == '__main__':
     shape = (1,1)
 
     from actor_critic import actor_critic
-    ac = actor_critic(shape,alpha=0.2,beta=0.75)
+    ac = actor_critic(shape,alpha=1,beta=0.75)
     lqr= LQR(shape,range=(0,4),w0=1.)
-    print(lqr,lqr.range)
+    print lqr,lqr.range
 
     dt = 0.1
-    t = list(np.arange(0,5000,dt))
+    t = list(np.arange(0,100,dt))
 
     import sys,os
     sys.path.append(os.path.dirname(os.path.dirname(__file__))+ '/central_pattern_generator')
@@ -34,6 +34,7 @@ if __name__ == '__main__':
     rec_t = []
 
     for _ in t:
+        print _
         #print('LQR_main',lqr,lqr.reward())
         try:
             act,TDerr = ac.action(lqr,lqr.reward(),dt)

@@ -1,4 +1,4 @@
-#!/usr/env/bin python3
+#!/usr/env/bin python2
 import numpy as np
 
 #An Analysis of Actor-Critic Algorithms using Eligibility Traces:Reinforcement Learning with Imperfect Value Functions (kimura,1996?)
@@ -16,11 +16,11 @@ class critic(object):
         """
         TDerr = r_t + g*V(s_t+1) - V(s_t)
         """
-        try:
-            TDerr = reward + self.gamma*self.Value(state) - self.Value(self.lastState)
-        except RuntimeWarning:
-            print('critic.TDerror',self,state,self.lastState)
-            raise RuntimeWarning
+        #try:
+        TDerr = reward + self.gamma*self.Value(state) - self.Value(self.lastState)
+        #except RuntimeWarning:
+        #    print('critic.TDerror',self,state,self.lastState)
+        #    raise RuntimeWarning
         #print('TDerr',self.W,dt,self.alpha,TDerr,state)
         self.W_crt += dt*self.alpha*TDerr*state
         self.W_crt = np.nan_to_num(self.W_crt)
@@ -36,3 +36,6 @@ class critic(object):
         """
         #print('c_value\n',state,self.W_crt)
         return np.dot(state,self.W_crt.T)/state.shape[0]
+
+if __name__ == '__main__':
+    crt = critic(3,1,1)

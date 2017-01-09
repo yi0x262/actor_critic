@@ -1,8 +1,8 @@
-#!/usr/env/bin python3
+#!/usr/env/bin python2
 from actor import actor
 from critic import critic
 
-class actor_critic(actor,critic):
+class actor_critic(actor,critic,object):
     def __init__(self,inout,alpha=0.05,beta=0.90,gamma=0.95):
         """
         inout : (in,out)
@@ -28,4 +28,4 @@ if __name__ == '__main__':
     s = np.ones((1,i))
 
     ac = actor_critic((i,o))
-    print(*ac.action(s,1,0.1))
+    print ac.action(s,1,0.1)
