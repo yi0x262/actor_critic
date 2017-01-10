@@ -56,7 +56,7 @@ class weight_var(weight_eligibility,object):
     def __call__(self):
         try:
             return np.array(1./(1.+np.exp(-self)))
-        except:
+        except RuntimeWarning,e:
             return np.array(np.exp(self)/(1.+np.exp(self)))
     def eligibility(self,a,mu,sigma):
         return ((a-mu)**2-sigma**2)*(1-sigma)
@@ -72,13 +72,14 @@ class actor(object):
         self.mu = self.W_exp(state)
         self.sigma = self.W_var()
         #print('actor.__call__\nmu:\n{}\nsigma:\n{}'.format(self.mu,self.sigma))
-        #try:
-        print 'mu:\n',self.mu
-        print 'sigma:\n',self.sigma
-        self.lastAct = np.random.normal(self.mu,self.sigma)#*np.ones_like(self.sigma)
-        print 'action:\n',self.lastAct
-        #except:
-        #    raise RuntimeWarning('actor:lastAct\nmu:\n{}\nsigma:\n{}'.format(self.mu,self.sigma))
+        try:
+        #print 'mu:\n',self.mu
+        #print 'sigma:\n',self.sigma
+            self.lastAct = np.random.normal(self.mu,self.sigma)#*np.ones_like(self.sigma)
+        #print 'action:\n',self.lastAct
+        except ValueError,e:
+            print e
+            raise RuntimeWarning('actor:lastAct\nmu:\n{}\nsigma:\n{}'.format(self.mu,self.sigma))
         #np.ones_like save answer type ndarray if shape is (1,1)
         #(if not,it goes a float)
         return self.lastAct
